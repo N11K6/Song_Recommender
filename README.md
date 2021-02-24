@@ -33,15 +33,25 @@ The above is the process for finding similar songs within the existing dataframe
 An example of finding similar songs based on an existing entry is as follows:
 
 > If you like
+
 >   Sting - Children's Crusade
+
 > 
+
 >  You might enjoy the following songs:
+
 > 
+
 >  Sting - Consider Me Gone (rock)
+
 >  Kate Bush - Couldbusting (pop)
+
 >  Sting - Russians (rock)
+
 >  Nina Martinique - Silver Threads And Golden Needles (country)
+
 >  Desmond Dekker - Shanty Town (reggae)
+
 
 It can be noted that assigned genre appears to bear no correlation to the results, however, these songs can be found to still sound similar.
 
@@ -50,10 +60,15 @@ Using a new song as an input (Sebastian - Love in Motion), the following recomme
 > You might enjoy the following songs from the GTZAN database:
 
 >  The Tymes - You Little Trustmaker (disco)
+
 >  nan -nan (jazz)
+
 >  Public Enemy - Reggie Jax (hiphop)
+
 >  Carl Carlton - She's A Bad Mama Jama (disco)
+
 >  Shania Twain - You Win My Love (country)
+
 
 Again the algorithm has chosen songs based on similar sound. Note that the jazz recommendation is unidentified, but at least the genre exists to give an slight indication.
 
