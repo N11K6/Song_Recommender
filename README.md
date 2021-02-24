@@ -72,6 +72,13 @@ Using a new song as an input (Sebastian - Love in Motion), the following recomme
 
 Again the algorithm has chosen songs based on similar sound. Note that the jazz recommendation is unidentified, but at least the genre exists to give an slight indication.
 
+## Contents
+
+* **Notebooks :** Directory containing *.ipynb* notebooks documenting the approach and methodology for creating the program. *NOTE: embedded playback of audio files requires the actual audio dataset to be present.*
+* **dataframes :** Directory containing the generated dataframes for the features and names, as well as the list of names for artists and songs compiled by BL Sturm that is used.
+* *feature_pipeline.py* : The code for the feature extraction pipeline used to assemble the feature dataframe. Requires full audio dataset to run.
+* *song_recommender.py* : Recommender program. Can be used to import the _Song_Recommender class to obtain song recommendations on a given audio file, or run by itself to do the same. Requires features and names dataframes.
+
 ## Acknowledgements
 
 Credit should be given to Andrada Olteanu, who uploaded the dataset in this form on Kaggle(https://www.kaggle.com/andradaolteanu/gtzan-dataset-music-genre-classification), and has provided well documented examples features extraction, classification tasks, and a basis for a recommender system upon which this work expands.
