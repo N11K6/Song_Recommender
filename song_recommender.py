@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 23 23:27:25 2021
+Program for getting similar recommendations on a song, with selections from the GTZAN dataset.
 
 @author: nk
 """
-#%%
+#%% Dependencies:
+
 import numpy as np
 import pandas as pd
 import librosa
 from sklearn.preprocessing import scale
 from sklearn.metrics.pairwise import cosine_similarity
 
+#%%
 fdf = './dataframes/feature_dataframe.csv'
 ndf = './dataframes/names_dataframe.csv'
+# Choose song to get recommendations on (keep in mind the system will randomly consider a 30 excerpt)
+SELECTED_SONG = 'path/to/song/you/like.wav'
+
 #%%
 class _Song_Recommender():
     '''
@@ -89,7 +94,7 @@ class _Song_Recommender():
     def preprocess(self, song_name):
         
         data, _ = librosa.load(song_name)
-        
+        # Set length of segment to consider (30s long)
         duration = self.SAMPLE_RATE * 30
         
         # Pad to appropriate length...
@@ -196,4 +201,4 @@ if __name__ == "__main__":
     assert SR is SR0
     
     # make a recommendation
-    recommended_songs = SR.recommend_songs('eruption.wav', 5)
+    recommended_songs = SR.recommend_songs(SELECTED_SONG, 5)
