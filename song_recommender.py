@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Program for getting similar recommendations on a song, with selections from the GTZAN dataset.
+Created on Tue Feb 23 23:27:25 2021
 
 @author: nk
 """
-#%% Dependencies:
-
+#%%
 import numpy as np
 import pandas as pd
 import librosa
-from sklearn.preprocessing import scale
-from sklearn.metrics.pairwise import cosine_similarity
 
-#%%
+from sklearn.neighbors import NearestNeighbors
+
+PATH_TO_SONG = 'path/to/a/song.wav'
+
 fdf = './dataframes/feature_dataframe.csv'
 ndf = './dataframes/names_dataframe.csv'
-# Choose song to get recommendations on (keep in mind the system will randomly consider a 30 excerpt)
-SELECTED_SONG = 'path/to/song/you/like.wav'
-
 #%%
 class _Song_Recommender():
     '''
@@ -31,11 +28,13 @@ class _Song_Recommender():
         names_dataframe : helper dataframe associating filenames and artist
         names/song titles
     '''
+    
+    # Load dataframes:
     feature_dataframe = pd.read_csv(fdf)
     names_dataframe = pd.read_csv(ndf)
-        
+    # Sample rate for all songs:
     SAMPLE_RATE = 22050
-    
+    # Instantiate once:
     _instance = None
     
     def extract_features(self, filename, y, feat_cols):
@@ -94,7 +93,7 @@ class _Song_Recommender():
     def preprocess(self, song_name):
         
         data, _ = librosa.load(song_name)
-        # Set length of segment to consider (30s long)
+        
         duration = self.SAMPLE_RATE * 30
         
         # Pad to appropriate length...
@@ -118,65 +117,51 @@ class _Song_Recommender():
         # Add to the GTZAN feature dataframe:
         self.feature_dataframe = self.feature_dataframe.append(temp_df, ignore_index = True)
         
-    def construct_similarity_matrix(self):
-        '''
-        Constructs similarity matrix
-        '''
-        #Extract labels
-        df = self.feature_dataframe.set_index('filename')
-        
-        labels = df[['genre']]
-        
-        # Drop labels from original dataframe
-        df = df.drop(columns=['genre', ])
-
-        # Scale the data
-        df = scale(df)
-        
-        # Cosine similarity
-        similarity = cosine_similarity(df)
-
-        # Convert into a dataframe and then set the row index and column names as labels
-        sim_df_labels = pd.DataFrame(similarity)
-        similarity_matrix = sim_df_labels.set_index(labels.index)
-        similarity_matrix.columns = labels.index
-        
-        return similarity_matrix
-    
     def recommend_songs(self, song_name, n_similar_songs):
         '''
         Finds similar songs based on cosine similarity between features
         '''
+        # Update the dataframe with the new song info:
         self.preprocess(song_name)
         
-        similarity_matrix = self.construct_similarity_matrix()
+        # Isolate numerical features and set filename as the index:
+        knn_dataframe = self.feature_dataframe.set_index('filename')
+        knn_dataframe.drop(['genre'], axis = 1, inplace = True)
         
-        series = similarity_matrix[song_name].sort_values(ascending = False)
+        # KNN model:
+        model_knn = NearestNeighbors(metric = 'mahalanobis',
+                                 metric_params={'VI': np.cov(knn_dataframe, 
+                                                            rowvar =False)},
+                                 algorithm="auto")
         
-        # Find most simlilar songs to selected:
-        series = similarity_matrix[song_name].sort_values(ascending = False)
+        # Fit the KNN on the dataframe:
+        model_knn.fit(knn_dataframe.values)
         
-        print('\n You might enjoy the following songs from the GTZAN database:\n')
-        # Initialize filenames list:
-        similar_songs = []
-
-        # Get artists and titles of the most similar songs:
-        for i in range(1,n_similar_songs+1):
-            # Locate by filename in GTZAN:
-            fname = series.index[i]
-            # Add to filenames list:
-            similar_songs.append(fname)
-
-            # Temporary row to store names:
-            temp_row = self.names_dataframe.loc[
-                    self.names_dataframe['filename'] == fname, 
-                    ['Artist', 'Title', 'genre']]
-            # Display Artist and Title
-            print(str(temp_row.Artist.values[0])+
-                  ' -'+str(temp_row.Title.values[0])+
-                  ' ('+str(temp_row.genre.values[0])+')')
-
-        return similar_songs
+        # Find similar songs by implementing KNN - that's a long line - 
+        # an additional neighbor is used, as the first result is the selected song itself:        
+        distances, indices = model_knn.kneighbors(knn_dataframe.loc[song_name,:].values.reshape(1,-1), 
+                                                      n_neighbors = n_similar_songs + 1) 
+        
+        recommended_filenames = []
+    
+        # Generate recommendations list, and print song titles and artists:
+        for i in range(0, len(distances.flatten())):
+            # Get filename:
+            recommended_filename = knn_dataframe.index[indices.flatten()[i]]
+            # Append list:
+            recommended_filenames.append(recommended_filename)
+        
+            if i > 0:
+        
+                # Locate song title, artist. genre:
+                temp_row = self.names_dataframe.loc[self.names_dataframe['filename'] == recommended_filename,
+                                  ['Artist', 'Title', 'genre']]
+                # Display song info:
+                print(str(temp_row.Artist.values[0])+
+                      ' -'+str(temp_row.Title.values[0])+
+                      ' ('+str(temp_row.genre.values[0])+')')
+        
+        return recommended_filenames
 #%%
 def Song_Recommender():
     '''
@@ -201,4 +186,4 @@ if __name__ == "__main__":
     assert SR is SR0
     
     # make a recommendation
-    recommended_songs = SR.recommend_songs(SELECTED_SONG, 5)
+    recommended_songs = SR.recommend_songs(PATH_TO_SONG, 5)
