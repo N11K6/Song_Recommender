@@ -10,6 +10,10 @@ The GTZAN dataset was assembled within the MARSYAS framework (Music Analysis, Re
 
 Despite its popularity and useability, there are some practical issues when using the raw dataset. Perhaps most prevalent in the scope of this project, is the absence of Artist Names or Song Titles associated with each audio file. This has been pointed out by B. L. Sturm [2], who also took upon the task to assemble a list of all names and titles that could be traced. This list is used in the project.
 
+## XGB Classification
+
+A Cross-Gradient Booster was used to perform a genre classification of the songs in the dataset, using the same features extracted for the recommendation engine. Although correlation of the content with an assigned genre is against the point of the content-based recommender, success in such a task should at least offer an indication of how these features are capable of conveying high-level information on the sound of a song. 
+
 ## Approach
 
 As mentioned, the aim of this project is to offer a song recommendation service, therefore it will steer away from the usual task of genre classification that is associated with the GTZAN dataset. The recommendation algorithm is to be entirely content-based, meaning that it only considers features that are directly extracted from the audio instead of assigned labels. 
@@ -30,7 +34,7 @@ The above is the process for finding similar songs within the existing dataframe
 
 ## Results
 
-An example of finding similar songs based on an existing entry is as follows:
+An example of finding similar songs based on an existing entry was as follows:
 
 > If you like
 
