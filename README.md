@@ -20,15 +20,14 @@ As mentioned, the aim of this project is to offer a song recommendation service,
 
 1. For each audio file in the dataset, a number of features are extracted from its waveform. In order to get a single numerical value for each feature, many of them have to be averaged over the duration of the sample. To account for this averaging, the mean value and variance of such features are kept.
 2. The assembled dataframe contains 1000 rows, one for each song, and columns corresponding to each feature.
-3. From this feature dataframe, a 1000x1000 similarity matrix is assembled containing the distances of each song from all the others, using cosine similarity as a metric.
-4. The most similar sounding songs relative to a chosen song can be located simply by taking the values corresponding to the highest similarity.
-5. A helper dataframe, associating artist and song title to each filename in the dataset, is generated using the names list that is available. The filenames with highest similarity from the above matrix are used to identify each song.
-6. The recommendations are provided by artist and song title. The genre is also included, to give an indication of the content for unidentified entries.
+3. A K-nearest neighbors classifier is fit using the features in the dataframe, with the Mahalanobi distance as its metric for measuring similarity. The most similar songs to a chosen song, are the predicted nearest neighbors.
+4. A helper dataframe, associating artist and song title to each filename in the dataset, is generated using the names list that is available. The filenames with highest similarity from the above matrix are used to identify each song.
+5. The recommendations are provided by artist and song title. The genre is also included, to give an indication of the content for unidentified entries.
 
 The above is the process for finding similar songs within the existing dataframe. A program is also designed to receive any audio file as input, and reommend songs from the dataset depending on the similarity of their content. The pipeline is as follows:
 
 1. The features of the input audio file are extracted and added as an extra row to the main features dataframe.
-2. The similarity matrix is recalculated to indlude the new entry.
+2. The KNN classifier is re-fit to the feature dataframe to include the new entry.
 3. Most similar songs to the new entry are selected following the process above.
 4. The recommender prints out a list of similar songs by their artist, title and genre.
 
